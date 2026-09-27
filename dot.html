@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Mix Space Story</title>
+<style>
+body{margin:0;background:#1d1b19;color:#d9d3c7;font:13px -apple-system,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:10px}
+canvas{max-width:96vw;max-height:84vh;object-fit:contain;box-shadow:0 0 0 1px #ffffff14}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 12px}
+.bar button{font:inherit;color:#f1ece2;background:#ffffff12;border:1px solid #ffffff2a;border-radius:4px;padding:6px 12px;cursor:pointer}
+#scrub{width:min(46vw,520px);accent-color:#02aaf0}
+#info{font:11px ui-monospace,Menlo,monospace;color:#a39c90}
+</style>
+<canvas id="c"></canvas>
+<script src="core.js"></script><script src="studio-ui.js"></script><script src="studio.js"></script><script src="cels.js"></script><script src="materials.js"></script>
+<script src="dot-data.js"></script><script src="dot-cast.js"></script><script src="dot-world.js"></script><script src="dot-overlay.js"></script><script src="dot-act1.js"></script><script src="dot-state.js"></script><script src="dot-props.js"></script><script src="dot-acts.js"></script><script src="dot-score.js"></script>
+<script>
+'use strict';
+/* Brief
+Subject: Mix Space grows up as a planet, told by Dot, the logo's satellite. OUTLINE.md holds the whole film.
+Staging: growth in place. Camera locked on the planet with slow pull-backs; the torn page at 10.4 s is the only cut.
+Format: 16:9, 1920x1080, 24 fps preview, 60 fps delivery. Captions zh (LXGW WenKai).
+*/
+const TIMELINE = [
+  ['draft', 0, 6], ['kami', 6, A1.tear], ['torn-page', A1.tear, A1.light], ['first-light', A1.light, A1.v3], ['v3', A1.v3, A1.admin], ['admin', A1.admin, A1.end],
+].map(([name, a, b]) => ({name, dur: b - a, fn: (c, tau) => act1(c, a + tau)})).concat([
+  ['revert', 30, 35.2], ['yun', 35.2, 42], ['shiro', 42, 46], ['docs', 46, 49.4], ['ai-lamp', 49.4, 54.2], ['ai-summary', 54.2, 59.2], ['ai-writer', 59.2, 63.2],
+  ['ai-translation', 63.2, 68.2], ['ai-review', 68.2, 72.4], ['lexical', 72.4, 75.6], ['yohaku', 75.6, 79.2], ['v12-open', 79.2, 86.4], ['core-swap', 86.4, 93.4],
+  ['admin-react', 93.4, 98.4], ['monorepo', 98.4, 102.6], ['busiest-day', 102.6, 106.8], ['v14', 106.8, 113], ['signature', 113, 117], ['closing', 117, END],
+].map(([name, a, b]) => ({name, dur: b - a, fn: (c, tau) => act2(c, a + tau)})));
+const qfps = +new URLSearchParams(location.search).get('fps');
+defineFilm({palette: {...PALETTES.pencilMinimal, paper: DC.paper}, format: {ar: '16:9', width: 1920}, fps: [12, 24, 60].includes(qfps) ? qfps : 24, timeline: TIMELINE, score: dotScore});
+addEventListener('keydown', e => { if (e.code === 'Space' && !window.__studio) { e.preventDefault(); document.getElementById('play')?.click(); } });
+</script>

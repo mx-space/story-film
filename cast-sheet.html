@@ -1,0 +1,75 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Dot - Character Sheet</title>
+<style>body{margin:0;background:#1f1d1b;color:#ddd;font:13px system-ui;display:grid;place-items:center;min-height:100vh}canvas{max-width:100vw;max-height:92vh}</style>
+<canvas id="c"></canvas>
+<script src="core.js"></script><script src="studio.js"></script><script src="cels.js"></script><script src="materials.js"></script>
+<script src="dot-cast.js"></script><script src="dot-world.js"></script>
+<script>
+'use strict';
+function label(c, t, x, y, size = 26) { c.save(); c.font = `600 ${size}px ${DT_FONT}`; c.fillStyle = DC.lead; c.textAlign = 'center'; c.fillText(t, x, y); c.restore(); }
+function heading(c, t, x, y) { c.save(); c.font = `700 30px ${DT_FONT}`; c.fillStyle = DC.pencil; c.fillText(t, x, y); c.restore(); }
+
+function sheetDot(c) {
+  paper(c, DC.paper, null, 87);
+  heading(c, 'Dot · 表情 expressions (flat)', 60, 70);
+  const faces = [
+    ['好奇', {}],
+    ['抬头看', {gx: .3, gy: -1, lean: -.08}],
+    ['星星眼', {spark: 1, pupil: 1.2, mouth: 'grin', blush: 1}],
+    ['开心', {mood: 'happy', mouth: 'grin', blush: 1}],
+    ['惊讶', {eyeS: 1.12, pupil: .6, mouth: 'o', mouthOpen: .8, squash: 1.06}],
+    ['担心', {lid: .3, lidTilt: -.6, mouth: 'wobble', gy: .4, blush: .2}],
+    ['晕', {mood: 'dizzy', mouth: 'wobble', lean: -.15, squash: .94}],
+    ['得意', {lid: .35, lidTilt: .5, mouth: 'smile', gx: .6, lean: .06}],
+    ['困', {mood: 'sleep', mouth: 'flat', squash: .96, star: .5}],
+  ];
+  faces.forEach(([t, o], i) => { const x = 130 + i * 208; drawDot(c, dtPose(o), {x, y: 220, look: 'flat'}); label(c, t, x, 330); });
+  heading(c, 'Dot · 动作 actions (ink)', 60, 420);
+  const acts = [
+    ['绕行 orbit', {trail: 1, lean: .25, armL: 2.4, armR: 2.2, gx: .8}, 0],
+    ['挥手 wave', {armR: -1.2, reachR: 1.2, mouth: 'grin', mood: 'happy'}, 0],
+    ['指 point', {armR: -.15, reachR: 1.4, gx: 1, lean: .05}, 0],
+    ['拖 tow', {armL: .35, reachL: 1.4, armR: -.6, lean: .22, lid: .2, mouth: 'flat'}, 1],
+    ['推 push', {armL: .1, armR: .05, reachL: 1.3, reachR: 1.3, lean: .3, squash: .92, mood: 'squeeze', mouth: 'flat'}, 0],
+    ['下蹲 squash', {squash: .8, armL: 1.2, armR: 1.4, lid: .2}, 0],
+    ['弹起 stretch', {squash: 1.18, armL: -1.1, armR: -1.1, mouth: 'o', mouthOpen: .5}, 0],
+    ['眨眼 blink', {mood: 'blink'}, 0],
+  ];
+  acts.forEach(([t, o, tow], i) => {
+    const x = 150 + i * 222 + (i >= 3 ? 90 : 0), y = 560;
+    const G = drawDot(c, dtPose(o), {x, y, look: 'ink'});
+    if (tow) { const h = dtWorld(G.anchors.handL, {x, y}); c.save(); c.strokeStyle = DC.ink; c.lineWidth = 1.6; c.beginPath(); c.moveTo(h[0], h[1]); c.quadraticCurveTo(h[0] - 25, h[1] + 25, h[0] - 48, h[1] + 12); c.stroke(); c.restore(); drawMoon(c, 'kami', dtPose({r: 22, mood: 'happy', armL: 1.4, armR: 1.4}), {x: h[0] - 66, y: h[1] + 14}); }
+    label(c, t, x, y + 118);
+  });
+  heading(c, 'Dot · 材质 materials', 60, 770);
+  [['铅笔 pencil · 2020', 'pencil'], ['墨线 ink · 2021', 'ink'], ['平涂 flat · 主题年代', 'flat'], ['蓝图 chalk · 换芯', 'chalk']].forEach(([t, look], i) => {
+    const x = 170 + i * 300, y = 910;
+    if (look === 'chalk') { c.fillStyle = DC.chalkBg; c.beginPath(); c.roundRect(x - 120, y - 110, 240, 220, 14); c.fill(); }
+    drawDot(c, dtPose({gx: .3, mouth: 'smile'}), {x, y, look}); label(c, t, x, y + 140, 22);
+  });
+  heading(c, '尺寸 1× / 2× / 3×', 1320, 770);
+  [[.33, 1400], [.66, 1520], [1, 1700]].forEach(([s, x], i) => { drawDot(c, dtPose({trail: .8, lean: .2, gx: .7}), {x, y: 920, scale: s, look: 'flat'}); label(c, (i + 1) + '×', x, 1050, 22); });
+}
+
+function sheetWorld(c) {
+  paper(c, DC.paper, null, 88);
+  heading(c, '卫星 Moons · 组织里的其他仓库 (flat, 与 Dot 同一画法 + 一件标志物)', 60, 70);
+  Object.keys(MOONS).forEach((id, i) => {
+    const x = 130 + i * 236, y = 230, m = MOONS[id];
+    drawMoon(c, id, dtPose({r: 44, mood: i % 3 ? 'open' : 'happy', gx: (i % 2 ? .5 : -.3), mouth: 'smile'}), {x, y, look: id === 'admin2' ? 'pencil' : 'flat', tag: true, acc: id === 'ios' ? 'atom' : undefined});
+    label(c, id === 'ios' ? 'mx-admin · React 19 · 2026' : id === 'admin2' ? 'Vue 2 · 2020' : id === 'admin' ? 'Vue 3 · 2021' : m.since, x, y + 128, 20);
+  });
+  heading(c, '行星 The planet · 各幕材质', 60, 440);
+  const looks = [['pencil', '2020 草稿', {}], ['ink', '2021 重写', {lights: Array.from({length: 18}, (_, k) => [hash(k, 2) * 1.4 - .7, hash(k, 3) * 1.4 - .7])}], ['flat', 'v3 → v11', {rings: 3, lights: Array.from({length: 60}, (_, k) => [hash(k, 5) * 1.6 - .8, hash(k, 6) * 1.6 - .8])}], ['chalk', 'v12 换芯', {cut: 1, core: 'PostgreSQL'}], ['flat', 'v14 今天', {rings: 5, lights: Array.from({length: 140}, (_, k) => [hash(k, 8) * 1.7 - .85, hash(k, 9) * 1.7 - .85])}]];
+  looks.forEach(([look, t, o], i) => {
+    const x = 210 + i * 375, y = 700;
+    if (look === 'chalk') { c.fillStyle = DC.chalkBg; c.beginPath(); c.roundRect(x - 180, y - 190, 360, 380, 16); c.fill(); }
+    drawPlanet(c, x, y, 110, look, o); label(c, t, x, y + 230);
+  });
+  drawDot(c, dtPose({r: 30, trail: 1, lean: .3, gx: .8, mood: 'happy', mouth: 'grin'}), {x: 1780, y: 560, look: 'flat'});
+}
+
+defineFilm({palette: {...PALETTES.pencilMinimal, paper: DC.paper}, format: {ar: '16:9', width: 1920}, fps: 24,
+  timeline: [{name: 'dot', dur: 1 / 24, fn: sheetDot}, {name: 'world', dur: 1 / 24, fn: sheetWorld}]});
+</script>
