@@ -7,7 +7,7 @@
 A two-minute hand-drawn film about how Mix Space grew up, told by Dot, the little satellite from the logo.
 
 - 行星是 Mix Space，一次提交点亮一盏灯（按 `mx-space/core` 每天的真实提交数），一个大版本一道光环。
-- 四幕四种材质：铅笔草稿（2020）→ 墨线重写（2021）→ 平涂换脸（主题与 AI）→ 蓝图换芯（MongoDB → PostgreSQL、后台 React 重写、monorepo）→ logo 蓝（v14）。
+- 四幕五种材质：铅笔草稿（2020）→ 墨线重写（2021）→ 平涂换脸（主题与 AI）→ 蓝图换芯（MongoDB → PostgreSQL、后台 React 重写、monorepo）→ logo 蓝（v14）。
 - 画面上的 hash、日期、提交数都来自 git 历史，见 `OUTLINE.md` 的「依据」一列。
 
 ## 预览
